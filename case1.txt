@@ -1,0 +1,32 @@
+###REPORTED_ON
+20 January 2025
+
+###CHAT
+[14/01/2025, 10:02] +91 88XXX 11223: Good morning. Inspector Verma speaking, Mumbai Cyber Crime Cell.
+[14/01/2025, 10:03] +91 88XXX 11223: A parcel booked in your name has been intercepted with 150g MDMA at Mumbai airport.
+[14/01/2025, 10:04] Me: sir naaku em parcel ledu, I have not sent anything
+[14/01/2025, 10:05] +91 88XXX 11223: Your Aadhaar is linked to this parcel. NDPS Act case. Punishment up to 20 years.
+[14/01/2025, 10:07] +91 88XXX 11223: You are under digital arrest from this moment. Do not disconnect. Do not inform family or bank.
+[14/01/2025, 10:09] Me: నా దగ్గర డబ్బు లేదు సార్
+[14/01/2025, 10:15] +91 88XXX 11223: We must verify your funds are not from laundering. Amount is fully refundable in 24 hours after RBI clearance.
+[14/01/2025, 10:16] +91 88XXX 11223: Transfer Rs 50,000 now to verify.rbi2025@okaxis
+[14/01/2025, 10:22] Me: sent sir T2501140900123456
+[14/01/2025, 10:45] +91 88XXX 11223: Verification incomplete. Rs 1,50,000 more or NBW will be issued today.
+[14/01/2025, 10:52] Me: paisa bhej diya, T2501141052987654
+[14/01/2025, 11:20] +91 88XXX 11223: Install AnyDesk from Play Store so our officer can verify your bank screen.
+[14/01/2025, 11:30] +91 88XXX 11223: पैसा भेज दो वरना वारंट आ जाएगा। Final clearance Rs 3,00,000 within 1 hour.
+[14/01/2025, 12:10] Me: I have sent 300000
+[14/01/2025, 17:00] Me: Inspector Verma?
+
+###OCR
+Payrnent Successfui   To: verify.rbi2O25@okaxis   Rs 5O,OOO
+UTR T25O114O9OO123456    14 Jan 2O25, 1O:2O AM
+
+###OCR
+Payment Successful | To: cbi.clearance@okicici | Rs 3,00,000 | UTR: T2501141052987654 | 14 Jan 2025, 12:08 PM
+
+###SMS
+SBI: Rs 50,000 debited from A/c XX4521 on 14-Jan-25. UPI Ref T2501140900123456. Avl Bal Rs 12,340.
+SBI: Rs 1,50,000 debited from A/c XX4521 on 14-Jan-25. UPI Ref T2501141052987654. Avl Bal Rs 4,62,340.
+VM-KYCUPD: Dear customer your SBI KYC expires today. Update at http://sbi-kyc-verify.co.in to avoid block.
+SBI: Rs 3,00,000 debited from A/c XX4521 on 14-Jan-25. UPI Ref T2501141210556677. Avl Bal Rs 1,62,340.
