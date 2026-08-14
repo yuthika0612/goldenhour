@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Golden Hour — fraud evidence to filed complaint</title>
+<style>
+:root{
+  --paper:#F2F0EC;      /* cool paper, not cream */
+  --ink:#12171F;        /* near-black navy ink */
+  --ink-soft:#4A5361;
+  --rule:#C9C6BF;
+  --field:#FFFFFF;
+  --amber:#B4762A;      /* reserved: time-critical only */
+  --amber-wash:#F6EBDA;
+  --critical:#9B1C1C;
+  --high:#B4762A;
+  --medium:#4A5361;
+  --ok:#1F5D3A;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--paper);color:var(--ink);
+  font-family:ui-sans-serif,system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  font-size:15px;line-height:1.55;
+  font-variant-numeric:tabular-nums;   /* forensic: figures must align */
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1080px;margin:0 auto;padding:0 20px 80px}
+
+/* ---------- masthead ---------- */
+header{border-bottom:2px solid var(--ink);padding:28px 0 14px;margin-bottom:0}
+.title{
+  font-size:clamp(30px,5.5vw,46px);font-weight:800;letter-spacing:-.03em;
+  line-height:.98;margin:0;text-transform:uppercase;
+}
+.title span{display:block;font-weight:300;letter-spacing:.02em}
+.sub{
+  margin:10px 0 0;font-size:12px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--ink-soft);
+}
+
+/* ---------- signature: the clock ---------- */
+.clock{
+  border-bottom:1px solid var(--rule);padding:18px 0 22px;
+  display:grid;grid-template-columns:auto 1fr;gap:20px;align-items:center;
+}
+.dial{
+  width:74px;height:74px;border-radius:50%;flex:none;
+  background:conic-gradient(var(--amber) var(--deg,0deg), #E4E1DA 0deg);
+  display:grid;place-items:center;position:relative;
+}
+.dial::after{
+  content:"";position:absolute;inset:9px;border-radius:50%;background:var(--paper);
+}
+.dial b{position:relative;z-index:1;font-size:17px;font-weight:800;letter-spacing:-.02em}
+.clock-copy strong{display:block;font-size:15px}
+.clock-copy span{color:var(--ink-soft);font-size:13.5px}
+
+/* ---------- layout ---------- */
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:0}
+@media(max-width:860px){.cols{grid-template-columns:1fr}}
+.col{padding:22px 0}
+.col+.col{border-left:1px solid var(--rule);padding-left:26px}
+@media(max-width:860px){.col+.col{border-left:0;padding-left:0;border-top:1px solid var(--rule)}}
+
+.lab{
+  font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--ink-soft);display:block;margin:16px 0 5px;font-weight:600;
+}
+.lab:first-child{margin-top:0}
+textarea,input[type=text]{
+  width:100%;background:var(--field);border:1px solid var(--rule);border-radius:2px;
+  padding:9px 11px;font:inherit;font-size:13.5px;color:var(--ink);
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+textarea{resize:vertical;line-height:1.5}
+textarea:focus,input:focus{outline:2px solid var(--ink);outline-offset:1px;border-color:var(--ink)}
+.hint{font-size:12px;color:var(--ink-soft);margin:4px 0 0}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:520px){.row{grid-template-columns:1fr}}
+
+/* ---------- action bar ---------- */
+.bar{
+  border-top:2px solid var(--ink);margin-top:8px;padding:16px 0;
+  display:flex;gap:14px;align-items:center;flex-wrap:wrap;
+}
+button.go{
+  background:var(--ink);color:var(--paper);border:0;border-radius:2px;
+  padding:13px 26px;font:inherit;font-weight:700;letter-spacing:.04em;
+  text-transform:uppercase;font-size:13px;cursor:pointer;
+}
+button.go:hover{background:#000}
+button.go:disabled{opacity:.45;cursor:wait}
+button.ghost{
+  background:none;border:1px solid var(--rule);border-radius:2px;
+  padding:12px 16px;font:inherit;font-size:13px;cursor:pointer;color:var(--ink);
+}
+button.ghost:hover{border-color:var(--ink)}
+.chk{display:flex;align-items:center;gap:7px;font-size:13px;color:var(--ink-soft)}
+
+/* ---------- results ---------- */
+#out{display:none;margin-top:8px}
+.tally{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--rule);
+  border:1px solid var(--rule);margin:22px 0;
+}
+@media(max-width:640px){.tally{grid-template-columns:repeat(2,1fr)}}
+.tally div{background:var(--paper);padding:13px 14px}
+.tally .k{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft)}
+.tally .v{font-size:23px;font-weight:800;letter-spacing:-.02em;margin-top:2px}
+
+h2.sec{
+  font-size:12px;letter-spacing:.16em;text-transform:uppercase;font-weight:700;
+  border-bottom:1px solid var(--ink);padding-bottom:6px;margin:34px 0 14px;
+}
+.find{border-left:3px solid var(--medium);padding:9px 0 9px 14px;margin:0 0 13px}
+.find.CRITICAL{border-color:var(--critical)}
+.find.HIGH{border-color:var(--high)}
+.find .sev{
+  font-size:10.5px;letter-spacing:.13em;font-weight:700;text-transform:uppercase;
+}
+.find.CRITICAL .sev{color:var(--critical)}
+.find.HIGH .sev{color:var(--high)}
+.find.MEDIUM .sev{color:var(--medium)}
+.find .obs{margin:3px 0 0;font-weight:600}
+.find .why{margin:3px 0 0;color:var(--ink-soft);font-size:13.5px}
+.find .fix{margin:3px 0 0;color:var(--ink-soft);font-size:13px;font-style:italic}
+.src{
+  font-family:ui-monospace,Menlo,monospace;font-size:11px;color:var(--ink-soft);
+  letter-spacing:.02em;
+}
+table.tl{width:100%;border-collapse:collapse;font-size:13.5px}
+table.tl td{border-bottom:1px solid var(--rule);padding:7px 9px;vertical-align:top}
+table.tl td.t{white-space:nowrap;color:var(--ink-soft);font-size:12.5px;width:1%}
+table.tl td.s{white-space:nowrap;font-weight:700;font-size:11.5px;letter-spacing:.06em;width:1%}
+.tags span{
+  display:inline-block;border:1px solid var(--rule);border-radius:2px;
+  padding:1px 6px;font-size:10.5px;letter-spacing:.08em;margin:0 4px 3px 0;
+  color:var(--ink-soft);white-space:nowrap;
+}
+.tabs{display:flex;gap:0;border-bottom:1px solid var(--rule);flex-wrap:wrap;margin-top:8px}
+.tabs button{
+  background:none;border:0;border-bottom:2px solid transparent;padding:9px 14px;
+  font:inherit;font-size:12px;letter-spacing:.1em;text-transform:uppercase;
+  cursor:pointer;color:var(--ink-soft);
+}
+.tabs button[aria-selected=true]{color:var(--ink);border-bottom-color:var(--ink);font-weight:700}
+pre.doc{
+  background:var(--field);border:1px solid var(--rule);border-top:0;padding:18px;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  font-size:12.5px;line-height:1.6;white-space:pre-wrap;word-break:break-word;
+  max-height:520px;overflow:auto;margin:0;
+}
+.urgent{background:var(--amber-wash);border:1px solid var(--amber);padding:16px 18px;margin:20px 0}
+.urgent h3{margin:0 0 8px;font-size:12px;letter-spacing:.15em;text-transform:uppercase;color:var(--amber)}
+.urgent pre{margin:0;font:inherit;font-size:13.5px;white-space:pre-wrap}
+.suggestions{border:1px solid var(--rule);border-left:3px solid var(--ink-soft);padding:14px 18px;margin:0 0 20px}
+.suggestions h3{margin:0 0 8px;font-size:12px;letter-spacing:.15em;text-transform:uppercase;color:var(--ink-soft)}
+.suggestions ul{margin:0;padding-left:18px}
+.suggestions li{margin:4px 0;font-size:13.5px;color:var(--ink-soft)}
+.note{font-size:12.5px;color:var(--ink-soft);border-top:1px solid var(--rule);margin-top:34px;padding-top:14px}
+.privacy{margin-top:18px;border:1px solid var(--rule);border-radius:2px;font-size:12.5px}
+.privacy summary{
+  cursor:pointer;padding:11px 16px;font-weight:700;color:var(--ink);
+  list-style:none;display:flex;align-items:center;gap:8px;user-select:none;
+}
+.privacy summary::-webkit-details-marker{display:none}
+.privacy summary::before{content:"+";font-weight:800;color:var(--ink-soft);width:12px}
+.privacy[open] summary::before{content:"–"}
+.privacy summary:hover{background:var(--field)}
+.privacy-body{padding:4px 18px 18px;border-top:1px solid var(--rule);color:var(--ink-soft)}
+.privacy-body h4{color:var(--ink);font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+  margin:16px 0 6px}
+.privacy-body h4:first-child{margin-top:14px}
+.privacy-body p,.privacy-body li{line-height:1.6;margin:4px 0}
+.privacy-body ul{margin:6px 0;padding-left:20px}
+.err{border-left:3px solid var(--critical);padding-left:14px;margin:18px 0}
+@media(prefers-reduced-motion:no-preference){
+  #out[data-shown=true]{animation:rise .28s ease-out}
+  @keyframes rise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1 class="title">Golden<span>Hour</span></h1>
+  <p class="sub">Fraud evidence &rarr; filing-ready complaint · NCRP · 1930 · Bank · NPCI</p>
+</header>
+
+<section class="clock">
+  <div class="dial" id="dial"><b id="dialTxt">—</b></div>
+  <div class="clock-copy">
+    <strong>Money can be frozen while it is still in the first accounts it lands in.</strong>
+    <span id="clockLine">Paste what you have. Missing pieces are fine — the report will say what is missing.</span>
+  </div>
+</section>
+
+<form id="f">
+<div class="cols">
+  <div class="col">
+    <label class="lab" for="chat">Chat or messages</label>
+    <textarea id="chat" name="chat" rows="11" placeholder="Paste the WhatsApp or Telegram export, or the messages as you have them."></textarea>
+    <p class="hint">Export from WhatsApp: open the chat &rarr; menu &rarr; More &rarr; Export chat &rarr; Without media.</p>
+
+    <label class="lab" for="sms">Bank SMS alerts</label>
+    <textarea id="sms" name="sms" rows="6" placeholder="Paste every debit and credit alert, one per line."></textarea>
+    <p class="hint">These carry the reference numbers and balances the checks run on. Include all of them, even ones that look unrelated.</p>
+  </div>
+
+  <div class="col">
+    <label class="lab" for="images">Screenshot images</label>
+    <input type="file" id="images" name="images" multiple accept="image/*">
+    <p class="hint">Read automatically -- text recognition first, and only if that fails does the AI model read the image directly. Nothing for you to choose.</p>
+
+    <label class="lab" for="note">What happened, in your words</label>
+    <textarea id="note" name="note" rows="5" placeholder="Anything you remember: who called, what they said, what was deleted."></textarea>
+
+    <label class="lab" for="victim_name">Complainant details</label>
+    <div class="row">
+      <div>
+        <input type="text" id="victim_name" name="victim_name" placeholder="Full name">
+      </div>
+      <div>
+        <input type="text" id="victim_mobile" name="victim_mobile" placeholder="Mobile (registered with bank)">
+      </div>
+    </div>
+    <div class="row" style="margin-top:12px">
+      <div>
+        <input type="text" id="victim_email" name="victim_email" placeholder="Email address">
+      </div>
+      <div>
+        <input type="text" id="victim_address" name="victim_address" placeholder="Address">
+      </div>
+    </div>
+    <p class="hint">These fill the complaint forms directly. Leave any blank and the document will show [TO BE FILLED].</p>
+    <label class="lab" for="reported_on">Today's date</label>
+    <input type="text" id="reported_on" name="reported_on" placeholder="Loading...">
+    <p class="hint">Filled in automatically. Change it if you are reporting on behalf of someone, or if it is wrong.</p>
+  </div>
+</div>
+
+<div class="bar">
+  <button class="go" id="run" type="submit">Build the complaint</button>
+  <select class="ghost" id="demoSelect" style="padding:12px 10px">
+    <option value="">Load a sample case…</option>
+    <option value="digital_arrest">Digital arrest scam (escalating demands)</option>
+    <option value="fake_proof">Fake payment proof shown to a shopkeeper</option>
+    <option value="task_scam">Job/task scam (small refund, then losses)</option>
+    <option value="elderly_thirdparty">Elderly victim, reported by son</option>
+    <option value="unclear_debit">Unrecognized debit -- unsure if fraud</option>
+  </select>
+</div>
+</form>
+
+<div id="out">
+  <div class="tally">
+    <div><div class="k">Sent out</div><div class="v" id="tGross">—</div></div>
+    <div><div class="k">Came back</div><div class="v" id="tIn">—</div></div>
+    <div><div class="k">Net loss</div><div class="v" id="tNet">—</div></div>
+    <div><div class="k">Flags</div><div class="v" id="tFlags">—</div></div>
+  </div>
+
+  <div class="urgent" id="urgentBox">
+    <h3>Do this first</h3>
+    <pre id="urgent"></pre>
+  </div>
+
+  <div class="suggestions" id="suggestions" style="display:none"></div>
+  <p class="hint" id="techNote" style="display:none"></p>
+
+  <h2 class="sec">What does not add up</h2>
+  <div id="findings"></div>
+
+  <h2 class="sec">How it happened</h2>
+  <table class="tl"><tbody id="timeline"></tbody></table>
+
+  <h2 class="sec">Your documents</h2>
+  <div class="tabs" id="tabs"></div>
+  <pre class="doc" id="doc"></pre>
+  <div class="bar" style="border-top:1px solid var(--rule);margin-top:0">
+    <button class="ghost" id="copy" type="button">Copy this document</button>
+    <button class="ghost" id="dl" type="button">Download all</button>
+  </div>
+
+</div>
+
+<p class="note">
+  Golden Hour prepares paperwork from what you paste. It does not file anything,
+  contact anyone, or give legal advice. Check every detail before you submit it.
+  Nothing you paste is saved on this machine.
+</p>
+
+<details class="privacy">
+  <summary>Privacy policy</summary>
+  <div class="privacy-body">
+    <h4>What this tool does with your data</h4>
+    <p>Golden Hour is a document-preparation tool, not a filing service. It
+    does not submit anything to police, banks, or any authority on your
+    behalf. You review and submit the generated documents yourself.</p>
+
+    <h4>What is stored</h4>
+    <p><strong>Nothing, persistently.</strong> Evidence you paste or upload
+    (chat text, bank SMS, screenshots, your name/contact details) is held in
+    memory only for the duration of processing your request and is discarded
+    once the response is sent back to your browser. This server does not
+    write your evidence to a database, a log file, or a disk. Closing or
+    refreshing this page removes everything from your browser too.</p>
+
+    <h4>Where your data travels during processing</h4>
+    <ul>
+      <li><strong>To Google's Gemini API</strong> — the text and any
+      screenshots that could not be read locally are sent to Google for
+      analysis, subject to Google's own API data-handling terms. Google's
+      API terms (at the time of writing) state that data sent via the API is
+      not used to train their models by default for paid tiers; verify the
+      current terms for the tier this deployment uses.</li>
+      <li><strong>Nowhere else.</strong> No analytics, no third-party
+      trackers, no advertising networks, no data brokers.</li>
+    </ul>
+
+    <h4>The cryptographic seal</h4>
+    <p>Each analysis produces a Merkle root (a hash-based fingerprint) of
+    the evidence bundle, generated inside this request and returned to you.
+    The seal is derived from your data but does not itself reveal document
+    contents — it is used to detect later tampering, not to identify you.
+    It is not stored server-side either.</p>
+
+    <h4>Complainant details (name, mobile, email, address)</h4>
+    <p>Collected only to pre-fill the generated complaint documents. Used
+    for nothing else, sent nowhere except into the documents shown to you
+    and, if included in the evidence text, to the Gemini API as part of
+    that analysis.</p>
+
+    <h4>This is a student project</h4>
+    <p>Golden Hour is an academic project, not a commercial or government
+    service. It has not undergone formal security audit or legal review.
+    Do not paste information you are not comfortable sending to Google's
+    API for processing. If you are in the middle of an active fraud, treat
+    the "Do this first" guidance as a starting point, not a substitute for
+    contacting your bank and 1930 directly.</p>
+  </div>
+</details>
+
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+let DOCS = {}, CURRENT = "";
+
+const money = v => (v === null || v === undefined)
+  ? "—" : "\u20B9" + Number(v).toLocaleString("en-IN");
+
+/* the dial: how much of the first 24h has burned since the last debit */
+function setClock(hours){
+  if (hours === null){ $("dial").style.setProperty("--deg","0deg"); $("dialTxt").textContent="—"; return; }
+  const frac = Math.min(hours / 24, 1);
+  $("dial").style.setProperty("--deg", (frac*360).toFixed(0)+"deg");
+  $("dialTxt").textContent = hours < 48 ? Math.round(hours)+"h" : Math.round(hours/24)+"d";
+  $("clockLine").textContent = hours <= 2
+    ? "You are inside the window where freezing works best. Call 1930 before anything else."
+    : hours < 24
+      ? "Hours matter now. File first, tidy the paperwork afterwards."
+      : "The fastest window has passed. Filing still matters: accounts get traced and cases get linked.";
+}
+
+function renderFindings(list){
+  const box = $("findings");
+  if(!list.length){ box.innerHTML = '<p class="hint">No contradictions found in what was supplied.</p>'; return; }
+  box.innerHTML = list.map(f => `
+    <div class="find ${f.severity}">
+      <div class="sev">${f.severity} · ${f.check} · ${f.origin === "rules" ? "checked" : "read"}</div>
+      <p class="obs">${esc(f.observed)}</p>
+      ${f.why_it_matters ? `<p class="why">${esc(f.why_it_matters)}</p>` : ""}
+      ${f.resolves_with ? `<p class="fix">Settled by: ${esc(f.resolves_with)}</p>` : ""}
+      ${f.evidence && f.evidence.length ? `<p class="src">${f.evidence.join(" · ")}</p>` : ""}
+    </div>`).join("");
+}
+
+function renderTimeline(events){
+  const b = $("timeline");
+  if(!events.length){ b.innerHTML = '<tr><td class="hint">No sequence was reconstructed. Run with the model to read the conversation.</td></tr>'; return; }
+  b.innerHTML = events.map(e => `
+    <tr>
+      <td class="t">${esc(e.timestamp || "unclear")}</td>
+      <td class="s">${esc(e.stage || "")}</td>
+      <td>
+        ${esc(e.description || "")}
+        ${e.tactics && e.tactics.length ? `<div class="tags">${e.tactics.map(t=>`<span>${esc(t)}</span>`).join("")}</div>` : ""}
+      </td>
+      <td class="src">${(e.sources||[]).join(",")}</td>
+    </tr>`).join("");
+}
+
+const TAB_ORDER = [
+  ["brief_1930","1930 call"], ["bank_letter","Bank letter"],
+  ["ncrp","NCRP fields"], ["npci","NPCI package"],
+  ["evidence_index","Evidence index"]
+];
+
+function renderDocs(outputs){
+  DOCS = {};
+  TAB_ORDER.forEach(([k]) => {
+    if(!(k in outputs)) return;
+    DOCS[k] = typeof outputs[k] === "string" ? outputs[k] : JSON.stringify(outputs[k], null, 2);
+  });
+  $("tabs").innerHTML = TAB_ORDER.filter(([k]) => k in DOCS)
+    .map(([k,label],i) => `<button type="button" role="tab" data-k="${k}" aria-selected="${i===0}">${label}</button>`).join("");
+  [...$("tabs").children].forEach(b => b.onclick = () => showDoc(b.dataset.k));
+  showDoc(Object.keys(DOCS)[0]);
+}
+
+function showDoc(k){
+  CURRENT = k;
+  $("doc").textContent = DOCS[k] || "";
+  [...$("tabs").children].forEach(b => b.setAttribute("aria-selected", b.dataset.k === k));
+}
+
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => (
+  {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+function renderSuggestions(list){
+  const box = $("suggestions");
+  if(!list || !list.length){ box.style.display = "none"; box.innerHTML = ""; return; }
+  box.style.display = "block";
+  box.innerHTML = `<h3>Additional notes</h3><ul>${
+    list.map(s => `<li>${esc(s)}</li>`).join("")}</ul>`;
+}
+
+$("f").addEventListener("submit", async ev => {
+  ev.preventDefault();
+  const btn = $("run");
+  btn.disabled = true; btn.textContent = "Reading the evidence…";
+  try{
+    const fd = new FormData();
+    ["chat","sms","note","victim_name","victim_mobile",
+     "victim_email","victim_address","reported_on"]
+      .forEach(k => fd.append(k, $(k).value));
+    for(const file of $("images").files) fd.append("images", file);
+
+    const res = await fetch("/analyse", {method:"POST", body:fd});
+    const data = await res.json();
+    if(data.error){ throw new Error(data.error); }
+
+    const s = data.summary;
+    $("tGross").textContent = money(s.gross_out);
+    $("tIn").textContent    = money(s.inflow);
+    $("tNet").textContent   = money(s.net_loss);
+    $("tFlags").textContent = data.findings.length;
+
+    renderFindings(data.findings);
+    renderTimeline(data.timeline);
+    renderDocs(data.outputs);
+    renderSuggestions(data.suggestions);
+    if (data.seal) {
+      $("techNote").textContent =
+        `Evidence sealed (Merkle root ${data.seal.merkle_root.slice(0,16)}…, `+
+        `${data.seal.n_items} item(s)). A ${data.fingerprint_dims}-dimensional `+
+        `similarity fingerprint was also computed, for matching this case `+
+        `against others in the future -- this deployment keeps no case `+
+        `history, so nothing is compared against yet.`;
+      $("techNote").style.display = "block";
+    }
+    $("urgent").textContent = data.outputs.urgent_actions
+      .replace(/^URGENT ACTIONS\s*\n+/, "");
+
+    $("out").style.display = "block";
+    $("out").dataset.shown = "true";
+    $("out").scrollIntoView({behavior:"smooth", block:"start"});
+  }catch(err){
+    $("findings").innerHTML = `<div class="err"><p class="obs">Could not build the complaint.</p>
+      <p class="why">${esc(err.message)}</p>
+      <p class="fix">Please try again in a moment.</p></div>`;
+    $("out").style.display = "block";
+  }finally{
+    btn.disabled = false; btn.textContent = "Build the complaint";
+  }
+});
+
+$("copy").onclick = () => navigator.clipboard.writeText(DOCS[CURRENT] || "")
+  .then(() => { $("copy").textContent = "Copied"; setTimeout(()=>$("copy").textContent="Copy this document",1400); });
+
+$("dl").onclick = () => {
+  const blob = new Blob([Object.entries(DOCS)
+    .map(([k,v]) => `===== ${k} =====\n\n${v}`).join("\n\n\n")], {type:"text/plain"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "golden-hour-dossier.txt";
+  a.click();
+};
+
+const SAMPLES = {
+
+  digital_arrest: {
+    victim_name: "Meera Krishnan", victim_mobile: "+91 98765 43210",
+    victim_email: "meera.k@example.com", victim_address: "14 Lake View Road, Chennai",
+    clockHours: 140,
+    chat: `[14/01/2025, 10:02] +91 88XXX 11223: Good morning. Inspector Verma speaking, Mumbai Cyber Crime Cell.
+[14/01/2025, 10:03] +91 88XXX 11223: A parcel booked in your name has been intercepted with 150g MDMA at Mumbai airport.
+[14/01/2025, 10:04] Me: sir naaku em parcel ledu, I have not sent anything
+[14/01/2025, 10:07] +91 88XXX 11223: You are under digital arrest from this moment. Do not disconnect. Do not inform family or bank.
+[14/01/2025, 10:15] +91 88XXX 11223: We must verify your funds are not from laundering. Fully refundable in 24 hours after RBI clearance.
+[14/01/2025, 10:16] +91 88XXX 11223: Transfer Rs 50,000 now to verify.rbi2025@okaxis
+[14/01/2025, 10:22] Me: sent sir T2501140900123456
+[14/01/2025, 10:45] +91 88XXX 11223: Verification incomplete. Rs 1,50,000 more or NBW will be issued today.
+[14/01/2025, 10:52] Me: paisa bhej diya, T2501141052987654
+[14/01/2025, 11:20] +91 88XXX 11223: Install AnyDesk so our officer can verify your bank screen.
+[14/01/2025, 12:10] Me: I have sent 300000
+[14/01/2025, 17:00] Me: Inspector Verma?`,
+    sms: `SBI: Rs 50,000 debited from A/c XX4521 on 14-Jan-25. UPI Ref T2501140900123456. Avl Bal Rs 12,340.
+SBI: Rs 1,50,000 debited from A/c XX4521 on 14-Jan-25. UPI Ref T2501141052987654. Avl Bal Rs 4,62,340.
+VM-KYCUPD: Dear customer your SBI KYC expires today. Update at http://sbi-kyc-verify.co.in to avoid block.
+SBI: Rs 3,00,000 debited from A/c XX4521 on 14-Jan-25. UPI Ref T2501141210556677. Avl Bal Rs 1,62,340.`,
+    note: "",
+  },
+
+  fake_proof: {
+    victim_name: "Shree Electronics (R. Ganesh)", victim_mobile: "+91 90000 11223",
+    victim_email: "shreeelectronics@example.com", victim_address: "Shop 7, Ranganathan Street, T. Nagar, Chennai",
+    clockHours: 3,
+    chat: `[02/03/2026, 19:41] Unknown +91 96XXX 77102: bhaiya payment done, check
+[02/03/2026, 19:41] Unknown +91 96XXX 77102: [image] paid.jpg — Payment Successfull Rs 18,500 sent to SHREE ELECTRONICS, UPI shreeelectronics@paytm, UTR 4471 2290 1183 6, 03 Mar 2026, 07:41 PM
+[02/03/2026, 19:48] Me: sir mujhe kuch nahi aaya, please check
+[02/03/2026, 19:49] Unknown +91 96XXX 77102: bank server slow hai, 30 min me aa jayega. maal de do
+[02/03/2026, 19:52] Unknown +91 96XXX 77102: [image] paid2.jpg — Payment Successful Rs 18,500 to SHREE ELECTRONICS, shreeelectronics@paytm, UTR 447122901183, 02 Mar 2026, 07:41 PM
+[02/03/2026, 20:30] Me: still not received
+[02/03/2026, 20:31] Unknown +91 96XXX 77102: I will come tomorrow, don't worry`,
+    sms: `Kotak: A/c XX9012 statement 02-Mar-2026 credits — 10:14 AM UPI 220119883421 Rs 2,300; 01:22 PM UPI 220119991204 Rs 7,850; 06:05 PM UPI 220120114577 Rs 1,120. No credit of Rs 18,500 on 02-Mar-2026 or 03-Mar-2026.`,
+    note: "Customer showed two different screenshots for the same claimed payment, sent 11 minutes apart. No matching credit ever appeared in our account.",
+  },
+
+  task_scam: {
+    victim_name: "Arjun Mehta", victim_mobile: "+91 99887 76655",
+    victim_email: "arjun.mehta@example.com", victim_address: "B-204 Sunrise Apartments, Pune",
+    clockHours: 30,
+    chat: `[28/05/2026, 11:02] "HR Priya | GrowTask": Hello, we saw your resume. Part time task work, Rs 150 per YouTube like. Interested?
+[28/05/2026, 14:10] Me: done 3 tasks
+[28/05/2026, 14:25] "HR Priya | GrowTask": Payment sent. Please confirm.
+[28/05/2026, 14:31] Me: received 450 thank you
+[29/05/2026, 10:00] "HR Priya | GrowTask": You are upgraded to prepaid task group. Join t.me/growtask_vip_batch7
+[30/05/2026, 09:15] "Manager Rohit | VIP7": Today's task: deposit Rs 5,000, complete 5 merchant reviews, receive Rs 6,500 in 2 hours.
+[30/05/2026, 12:40] Me: sent 5000, ref 445120099311
+[30/05/2026, 15:02] "Manager Rohit | VIP7": Credited. Well done.
+[30/05/2026, 15:10] Me: got 6500
+[31/05/2026, 13:20] Me: sent 50000 ref 445221873400
+[31/05/2026, 18:00] "Manager Rohit | VIP7": Task failed due to wrong sequence. To unlock withdrawal deposit Rs 75,000 penalty-clearance within today.
+[31/05/2026, 21:44] Me: sent 75000 ref 445290011276 please release my money
+[01/06/2026, 08:00] "Manager Rohit | VIP7": Account under audit. Wait 48 hours.`,
+    sms: `HDFC: Rs 5,000 debited 30-05-26 UPI 445120099311 to GROWTASK SOLUTION. Avl Bal 88,400.
+HDFC: Rs 6,500 credited 30-05-26 UPI 445120500122. Avl Bal 94,900.
+HDFC: Rs 50,000 debited 31-05-26 UPI 445221873400 to SRI VENKAT TRADERS. Avl Bal 44,900.
+HDFC: Rs 75,000 debited 31-05-26 UPI 445290011276 to M/S ANAND ENTERPRISE. Avl Bal -30,100.`,
+    note: "The Rs 6,500 'return' came from a different UPI handle (SATYA AGENCIES) than the one I paid (GROWTASK SOLUTION).",
+  },
+
+  elderly_thirdparty: {
+    victim_name: "", victim_mobile: "", victim_email: "", victim_address: "",
+    clockHours: 168,
+    chat: "",
+    sms: `Union Bank: Rs 24,999 debited a/c XXXX7781 on 21-07-26 via UPI. Ref 621411903355.
+Union Bank: Rs 19,999 debited a/c XXXX7781 on 21-07-26 via UPI. Ref 621411907812.`,
+    note: `Reporting on behalf of my mother, age 74. She says a woman called from "electricity board" last Tuesday about a pending bill, then a man called saying her account was hacked. She does not remember which app she used, thinks she sent money three times, maybe 40,000-45,000 total. She deleted the messages because the caller told her to. She only told me yesterday. Bank is Union Bank, she sometimes uses PhonePe.`,
+  },
+
+  unclear_debit: {
+    victim_name: "Karthik Subramaniam", victim_mobile: "+91 98123 45678",
+    victim_email: "karthik.s@example.com", victim_address: "9 Anna Nagar, Coimbatore",
+    clockHours: 20,
+    chat: "",
+    sms: `SBI: Rs 2,499 debited from A/c XX3345 on 12-Aug-26 via UPI. Ref 552104417789. Avl Bal Rs 8,120.`,
+    note: `I don't recognize this debit. I didn't authorize a payment I remember making around this amount today. No calls, no messages, nothing unusual that I noticed -- just found this SMS. Want to check before I panic and file something.`,
+  },
+};
+
+function loadSample(key){
+  const s = SAMPLES[key];
+  if(!s) return;
+  $("chat").value = s.chat;
+  $("sms").value = s.sms;
+  $("note").value = s.note;
+  $("victim_name").value = s.victim_name;
+  $("victim_mobile").value = s.victim_mobile;
+  $("victim_email").value = s.victim_email;
+  $("victim_address").value = s.victim_address;
+  setClock(s.clockHours);
+}
+
+$("demoSelect").addEventListener("change", ev => {
+  if(ev.target.value) loadSample(ev.target.value);
+  ev.target.value = "";   // reset so picking the same option twice still fires "change"
+});
+
+setClock(null);
+
+// Fill in today's date (IST) automatically. The person can still edit it --
+// this is a default for the common case, not a constraint.
+fetch("/today").then(r => r.json()).then(t => {
+  if (!$("reported_on").value) $("reported_on").value = t.date;
+}).catch(() => {});
+
+</script>
+</body>
+</html>
