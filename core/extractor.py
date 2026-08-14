@@ -20,7 +20,7 @@ from typing import List, Optional
 
 from .schema import IncidentRecord, EvidenceItem
 
-MODEL_NAME = os.environ.get("GOLDENHOUR_MODEL", "gemini-2.0-flash")
+MODEL_NAME = os.environ.get("GOLDENHOUR_MODEL", "gemini-3.5-flash")
 
 STAGES = """S01 CONTACT | S02 CREDIBILITY_PROP | S03 AUTHORITY_CLAIM |
 S04 PRETEXT | S05 THREAT | S06 ISOLATION | S07 TRUST_BUILD |
@@ -205,16 +205,28 @@ def call_gemini(evidence_text: str, api_key: Optional[str] = None,
                 reported_on: Optional[str] = None,
                 image_bytes: Optional[List[bytes]] = None) -> dict:
     """
-    Single extraction call. Requires google-generativeai and an API key.
+    Single extraction call, using the current unified Google Gen AI SDK
+    (`google-genai`, `from google import genai`).
+
+    NOTE ON SDK HISTORY: this file previously used the `google-generativeai`
+    package (`import google.generativeai as genai`). Google has deprecated
+    that package in favour of this one. If you see import errors mentioning
+    `google.generativeai`, the environment has the OLD package installed
+    instead of `google-genai` -- run `pip install -U google-genai` (and
+    `pip uninstall google-generativeai` if both are present).
 
     Screenshots are sent as native image parts alongside the text, using
-    Gemini's own vision -- not a local OCR binary. This is what makes the
-    tool deployable as-is on a plain Python web host: no tesseract system
-    package, no OS-level install step, nothing that differs between a
-    laptop and a free-tier container. If image_bytes is empty, this call is
-    text-only and behaves exactly as before.
+    the model's own vision -- not a local OCR binary. Local OCR is still
+    tried first (see web/server.py:_ocr_each_image); this path is only for
+    images OCR could not read.
+
+    Raises RuntimeError with the ORIGINAL error message attached on
+    failure. Callers must not swallow this silently -- a stale model name,
+    a bad key, or a quota error becomes invisible and looks identical to
+    "the AI reading step could not complete" with no way to diagnose it.
     """
-    import google.generativeai as genai
+    from google import genai
+    from google.genai import types
     from PIL import Image
     import io
 
@@ -222,30 +234,50 @@ def call_gemini(evidence_text: str, api_key: Optional[str] = None,
     if not key:
         raise RuntimeError(
             "GEMINI_API_KEY is not set. Set it in your environment (locally) "
-            "or in your host's dashboard (e.g. Render's Environment tab), "
-            "or run with --offline / tick 'Checks only' to use the "
-            "deterministic rules engine without the model."
+            "or in your host's dashboard (e.g. Render's Environment tab)."
         )
-    genai.configure(api_key=key)
-    model = genai.GenerativeModel(
-        MODEL_NAME,
-        system_instruction=SYSTEM_PROMPT,
-        generation_config={"response_mime_type": "application/json",
-                           "temperature": 0.1},
-    )
+
+    client = genai.Client(api_key=key)
+
     prompt = evidence_text
     if reported_on:
         prompt = (f"Reported on: {reported_on}. Treat this as the present date "
                   f"when resolving relative dates.\n\n{evidence_text}")
 
-    parts: List = [prompt]
+    contents: List = [prompt]
     for b in (image_bytes or []):
         try:
-            parts.append(Image.open(io.BytesIO(b)))
+            contents.append(Image.open(io.BytesIO(b)))
         except Exception:
             continue      # a corrupt upload should not fail the whole call
 
-    resp = model.generate_content(parts)
+    try:
+        resp = client.models.generate_content(
+            model=MODEL_NAME,
+            contents=contents,
+            config=types.GenerateContentConfig(
+                system_instruction=SYSTEM_PROMPT,
+                response_mime_type="application/json",
+                temperature=0.1,
+            ),
+        )
+    except Exception as exc:
+        # NOT swallowed here on purpose. web/server.py catches this at a
+        # higher level and degrades gracefully for the user-facing output,
+        # but the real cause must survive in the message for logs -- a
+        # generic "could not complete" with no detail is exactly what makes
+        # a stale MODEL_NAME or SDK/version mismatch invisible.
+        raise RuntimeError(
+            f"Gemini API call failed (model={MODEL_NAME}): {exc}") from exc
+
+    if not resp.text:
+        reason = "?"
+        if resp.candidates:
+            reason = getattr(resp.candidates[0], "finish_reason", "?")
+        raise RuntimeError(
+            f"Gemini API returned an empty response (model={MODEL_NAME}, "
+            f"finish_reason={reason}).")
+
     return parse_model_json(resp.text)
 
 
