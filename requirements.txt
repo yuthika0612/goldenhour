@@ -3,8 +3,11 @@ fastapi>=0.110
 uvicorn>=0.27
 python-multipart>=0.0.9
 
-# model extraction (optional: pipeline runs with --offline without it)
-google-generativeai>=0.8
+# model extraction (optional: pipeline degrades to rules-only without it)
+# google-generativeai is DEPRECATED by Google -- do not reinstall it. If it
+# is present alongside google-genai, uninstall it: both packages register
+# under the "google" namespace and can shadow each other.
+google-genai>=1.0
 
 # optional OCR for screenshot images
 pytesseract>=0.3.10
