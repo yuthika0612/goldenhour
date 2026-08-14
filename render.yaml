@@ -1,0 +1,14 @@
+# Render Blueprint — Docker runtime, so tesseract-ocr (a system binary) is
+# actually available in production. Push to GitHub, then in Render:
+#   New -> Blueprint -> connect the repo -> Render reads this file.
+# The API key is NEVER in this file or in the repo. It is entered once in
+# the Render dashboard (Environment tab) after the service is created.
+# sync: false means "prompt for a value, never store it in git".
+services:
+  - type: web
+    name: golden-hour
+    runtime: docker
+    plan: free
+    envVars:
+      - key: GEMINI_API_KEY
+        sync: false

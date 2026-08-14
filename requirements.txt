@@ -1,0 +1,16 @@
+# core web app
+fastapi>=0.110
+uvicorn>=0.27
+python-multipart>=0.0.9
+
+# model extraction (optional: pipeline runs with --offline without it)
+google-generativeai>=0.8
+
+# optional OCR for screenshot images
+pytesseract>=0.3.10
+pillow>=10.0
+
+# classical pre-extraction (reduces model token load)
+phonenumbers>=8.13
+dateparser>=1.2
+email-validator>=2.1
